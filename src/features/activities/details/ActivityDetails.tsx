@@ -1,9 +1,13 @@
-import { Button, Card, Image } from "semantic-ui-react"
-import { useStore } from "../../../app/stores/store"
-import LoadingComponent from "../../../app/layout/LoadingComponent"
 import { observer } from "mobx-react-lite"
-import { Link, useParams } from "react-router-dom"
 import { useEffect } from "react"
+import { useParams } from "react-router-dom"
+import { Grid } from "semantic-ui-react"
+import LoadingComponent from "../../../app/layout/LoadingComponent"
+import { useStore } from "../../../app/stores/store"
+import ActivityDetailsChat from "./ActivityDetailsChat"
+import ActivityDetailsHeader from "./ActivityDetailsHeader"
+import ActivityDetailsInfo from "./ActivityDetailsInfo"
+import ActivityDetailsSidebar from "./ActivityDetailsSidebar"
 
 
 const ActivityDetails = () => {
@@ -23,27 +27,17 @@ const ActivityDetails = () => {
     }
 
     return (
-        <Card fluid>
-            <Image src={`../../../../public/categoryImages/${selectedActivity.category}.jpg`} />
-            <Card.Content>
-                <Card.Header>{selectedActivity.title}</Card.Header>
+        <Grid>
+            <Grid.Column width={10}>
+                <ActivityDetailsHeader activity={selectedActivity} />
+                <ActivityDetailsInfo activity={selectedActivity} />
+                <ActivityDetailsChat />
+            </Grid.Column>
 
-                <Card.Meta>
-                    <span>{selectedActivity.date}</span>
-                </Card.Meta>
-
-                <Card.Description>
-                    {selectedActivity.description}
-                </Card.Description>
-
-                <Card.Content extra>
-                    <Button.Group widths={2}>
-                        <Button basic content='Edit' color='blue' as={Link} to={`/manage/${selectedActivity.id}`} />
-                        <Button basic content='Cancel' color='red' as={Link} to={'/activities'} />
-                    </Button.Group>
-                </Card.Content>
-            </Card.Content>
-        </Card>
+            <Grid.Column width={6}>
+                <ActivityDetailsSidebar />
+            </Grid.Column>
+        </Grid>
     )
 }
 

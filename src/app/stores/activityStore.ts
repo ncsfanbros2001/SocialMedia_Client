@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 export default class ActivityStore {
     activityRegistry = new Map<string, Activity>();
     selectedActivity: Activity | undefined = undefined;
-    // editMode = false;
+    editMode = false;
     loading = false;
     loadingInitial = false;
 
@@ -16,6 +16,17 @@ export default class ActivityStore {
 
     get activitiesByDate() {
         return Array.from(this.activityRegistry.values()).sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+    }
+
+    get groupedActivities() {
+        return Object.entries(
+            this.activitiesByDate.reduce((activities, activity) => {
+                const date = activity.date
+                activities[date] = activities[date] ? [...activities[date], activity] : [activity]
+
+                return activities
+            }, {} as { [key: string]: Activity[] })
+        )
     }
 
     loadActivities = () => {
@@ -72,7 +83,9 @@ export default class ActivityStore {
     }
 
     createActivity = async (activity: Activity) => {
-        this.loading = true;
+        runInAction(() => {
+            this.loading = true
+        })
         activity.id = uuid();
 
         try {
@@ -93,14 +106,16 @@ export default class ActivityStore {
     }
 
     updateActivity = async (activity: Activity) => {
-        this.loading = true;
+        runInAction(() => {
+            this.loading = true;
+        })
 
         try {
             await agents.Activities.update(activity);
             runInAction(() => {
                 this.activityRegistry.set(activity.id, activity)
                 this.selectedActivity = activity
-                //this.editMode = false
+                this.editMode = false
                 this.loading = false
             })
         }
@@ -113,7 +128,9 @@ export default class ActivityStore {
     }
 
     deleteActivity = async (id: string) => {
-        this.loading = true;
+        runInAction(() => {
+            this.loading = true
+        })
 
         try {
             await agents.Activities.delete(id);
