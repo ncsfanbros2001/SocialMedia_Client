@@ -32,7 +32,6 @@ axios.interceptors.response.use(async response => {
                         modalStateErrors.push(data.errors[key])
                     }
                 }
-
                 throw modalStateErrors.flat()
             }
             else {
