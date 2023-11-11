@@ -13,7 +13,7 @@ const ActivityListItem = ({ activity }: Props) => {
     const [target, setTarget] = useState('')
 
     const { activityStore } = useStore()
-    const { deleteActivity, loading } = activityStore
+    const { deleteActivity } = activityStore
 
 
     const handleActivityDelete = (e: SyntheticEvent<HTMLButtonElement>, id: string) => {
@@ -42,6 +42,7 @@ const ActivityListItem = ({ activity }: Props) => {
             <Segment>
                 <span>
                     <Icon name="clock" /> {format(activity.date!, 'dd MMM yyyy h:mm aa')}
+                    <br />
                     <Icon name="marker" /> {activity.venue}
                 </span>
             </Segment>
