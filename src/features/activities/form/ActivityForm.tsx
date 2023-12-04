@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Header, Segment } from 'semantic-ui-react';
 import * as Yup from 'yup';
-import { Activity } from '../../../app/Models/activity';
+import { ActivityFormValues } from '../../../app/Models/activity';
 import MyDateInput from '../../../app/common/form/MyDateInput';
 import MySelectInput from '../../../app/common/form/MySelectInput';
 import MyTextArea from '../../../app/common/form/MyTextArea';
@@ -12,23 +12,16 @@ import MyTextInput from '../../../app/common/form/MyTextInput';
 import { categoryOptions } from '../../../app/common/options/categoryOptions';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 import { useStore } from '../../../app/stores/store';
+import { v4 as uuid } from 'uuid';
 
 const ActivityForm = () => {
     const { activityStore } = useStore();
-    const { createActivity, updateActivity, loading, loadSingleActivity, loadingInitial } = activityStore;
+    const { createActivity, updateActivity, loadSingleActivity, loadingInitial } = activityStore;
 
     const navigate = useNavigate();
     const { id } = useParams();
 
-    const [activity, setActivity] = useState<Activity>({
-        id: '',
-        title: '',
-        category: '',
-        description: '',
-        date: null,
-        city: '',
-        venue: ''
-    });
+    const [activity, setActivity] = useState<ActivityFormValues>(new ActivityFormValues());
 
     const validationSchema = Yup.object({
         title: Yup.string().required("Activity title is required"),
@@ -41,16 +34,20 @@ const ActivityForm = () => {
 
     useEffect(() => {
         if (id) {
-            loadSingleActivity(id).then((activity) => setActivity(activity!))
+            loadSingleActivity(id).then((activity) => setActivity(new ActivityFormValues(activity)))
         }
     }, [])
 
-    const handleFormSubmit = (activity: Activity) => {
+    const handleFormSubmit = (activity: ActivityFormValues) => {
         if (activity.id) {
             updateActivity(activity).then(() => navigate(`/activities/${activity.id}`))
         }
         else {
-            createActivity(activity).then(() => navigate(`/activities/${activity.id}`))
+            let newActivity = {
+                ...activity,
+                id: uuid()
+            }
+            createActivity(newActivity).then(() => navigate(`/activities/${activity.id}`))
         }
     }
 
@@ -82,7 +79,7 @@ const ActivityForm = () => {
 
                         <Button
                             disabled={isSubmitting || !dirty || !isValid}
-                            loading={loading}
+                            loading={isSubmitting}
                             floated='right'
                             type='submit'
                             positive
